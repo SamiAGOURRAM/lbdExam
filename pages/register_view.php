@@ -22,7 +22,7 @@
         }
         ?>
       </p>
-      <p class="mt-4">Déjà inscrit ? <a href="index.html" class="text-blue-500">Connectez-vous</a></p>
+      <p class="mt-4">Déjà inscrit ? <a href="/index.html" class="text-blue-500">Connectez-vous</a></p>
     </div>
   </div>
 </body>

@@ -1,14 +1,15 @@
-
-<?php
+<?php 
 session_start();
-if(!isset($_SESSION['loggedin']) || trim($_SESSION['loggedin']) === ''){
-    header('location:/index.html?not logged in');
+if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] == false){
+    header("location:/index.html?error=you are not loggedin");
+    exit;
 }
-require('../dbconnect/dbconnect.php');
-$eid = $_GET['eid'];
-
-
+if(!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] == 0){
+    header("location:dashboard.php?error=you can not create an election");
+    exit;
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -16,12 +17,11 @@ $eid = $_GET['eid'];
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Voting - dashboard</title>
+  <title>Create election</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,106 +33,82 @@ $eid = $_GET['eid'];
 
   <!-- Template Main CSS File -->
   <link href="/assets/main.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
-  <!-- =======================================================
-  * Template Name: Yummy
-  * Updated: Mar 10 2023 with Bootstrap v5.2.3
-  * Template URL: https://bootstrapmade.com/yummy-bootstrap-restaurant-website-template/
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
-
-  <style>
-    .Dashboard_container{
-      max-width: 1270px;
-      margin: auto;
-    }
-    .card{
-      padding: 10px;
-      margin: 20px;
-    }
-  </style>
 </head>
-
+<style>
+    input[type='submit']{
+    background-color: #ce1212 !important;
+}
+</style>
 
 <body>
+
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
     <div class="container d-flex align-items-center justify-content-between">
 
-    <a href="/index.php" class="logo d-flex align-items-center me-auto me-lg-0">
-        <!-- Uncomment the line below if you also wish to use an image logo 
-        <img src="/assets/img/logo.png" alt="logo">-->
-        <h1>Voting System<span>.</span></h1>
+      <a href="index.html" class="logo d-flex align-items-center me-auto me-lg-0">
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <!-- <img src="assets/img/logo.png" alt=""> -->
+        <h1>Freshly<span>.</span></h1>
       </a>
 
       <nav id="navbar" class="navbar">
         <ul>
           <li><a href="/index.php">Home</a></li>
-          <li><a href="create_election.php">create an Election</a></li>
+          <li><a href="dashboard.php">Elections</a></li>
         </ul>
       </nav><!-- .navbar -->
-
-      <a class="btn-book-a-table" href="logout.php"><i class="fa fa-user" aria-hidden="true"></i> Log out</a>
-      <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
-      <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
 
     </div>
   </header><!-- End Header -->
 
   <main id="main">
-        <!-- ======= Breadcrumbs ======= -->
-        <div class="breadcrumbs">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <div class="breadcrumbs">
       <div class="container">
 
-        <div class="d-flex justify-content-center">
-          <h2 class="text-center">election dashboard</h2>
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>New election</h2>
+          <ol>
+            <li><a href="dashboard.php">Home</a></li>
+            <li>Create election</li>
+          </ol>
         </div>
 
       </div>
     </div><!-- End Breadcrumbs -->
 
     <section class="sample-page">
-    <div class="wrapper">
-        <div class="container-fluid">
-        <form method="post" action="vote_process.php">
-      <div class="mb-4">
-        <label for="candidate" class="text-lg">Select Candidate:</label>
-        <select class="form-select mt-1 block w-full" id="candidate" name="candidate">
-          <?php
-          // Connect to the database
-
-          // Fetch the candidate data from the database
-          $query = "SELECT candidate_id, candidate_name FROM candidates WHERE election_id = ?";
-          $stmt = $db->prepare($query);
-          $stmt->bind_param('i',$eid );
-          
-          $stmt->execute();
-          $result = $stmt->get_result();
-
-          if (!$result) {
-            die("Query failed: " . mysqli_error($db));
-          }
-
-          // Loop through the candidate data and generate the options dynamically
-          while ($row = mysqli_fetch_assoc($result)) {
-            echo '<option value="' . $row['candidate_id'] . '">' . $row['candidate_name'] . '</option>';
-          }
-
-          // Close the database connection
-          mysqli_close($db);
-          ?>
-        </select>
-      </div>
-          khkgjhg
-      <button type="submit" class="">
-        Vote
-      </button>
-    </form>     
+      <div class="d-flex justify-content-center flex-nowrap">
+      <form action="process-create-election.php" method="POST" class="w-50 margin-auto" id="form" >
+        <div class="form-group">
+            <label for="title">Title: </label>
+            <input class="form-control"type="text" name="title"  >
         </div>
-    </div>
+
+        <div class="form-group">
+            <label for="descr">description: </label>
+            <input class="form-control"type="text" name="descr"  >
+        </div>
+
+        <div class="form-group">
+            <label for="date">Start Date: </label>
+            <input type="date" name='start_date' id="startDate">
+        </div>
+
+        <div class="form-group">
+            <label for="date">End Date: </label>
+            <input type="date" name='end_date' id="endDate">
+        </div>
+
+        <input class="form-control mt-3 bg-primary text-light" type="submit" value="Create Ingredient">
+    </form>
+
+      </div>
+      <div class="alert alert-danger" role="alert" id="err"></div>
     </section>
 
   </main><!-- End #main -->
@@ -208,33 +184,40 @@ $eid = $_GET['eid'];
   <a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
 
-  <!-- Vendor JS Files -->
-
 
   <!-- Template Main JS File -->
+  <script src="/assets/js/main.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
   <script>
-    var data = <?php echo json_encode($data)?>;
-    data = data
-    console.log(data);
+    function compareDates() {
+        //Get the text in the elements
+        var from = document.getElementById('endDate').textContent;
+        var to = document.getElementById('startDate').textContent;
 
-    data.forEach(element => {
+        //Generate an array where the first element is the year, second is month and third is day
+        var splitFrom = from.split('/');
+        var splitTo = to.split('/');
 
-        var card = $('<div>', {class: "card"});
-        var cardBody = $('<div>', {class: "card-img-top"});
-        var text = $('<h5>', {class: "card-title"}).text(element[1]);
-        var anchorPoint =  $('<a>', {href :'participate.php?eid='+element[0],class: "mr-3"}).text('participate in '+ element[1]);
-        cardBody.append(text);
-        cardBody.append(anchorPoint);
-        card.append(cardBody);
-        $('#elections').append(card);
+        //Create a date object from the arrays
+        var fromDate = Date.parse(splitFrom[0], splitFrom[1] - 1, splitFrom[2]);
+        var toDate = Date.parse(splitTo[0], splitTo[1] - 1, splitTo[2]);
+
+        //Return the result of the comparison
+        return fromDate < toDate;
+    }
+    
+    endDate.min = new Date().toISOString().split("T")[0];
+    var end_date =document.getElementById('endDate').value;
+    var start_date =document.getElementById('startDate').value;
+    document.getElementById('form').addEventListener('submit', (e)=>{
+        console.log(compareDates())
+        if(compareDates()){
+            e.preventDefault();
+            $("#err").html("invalid dates");
+        }
         
-        
-    });
+    })
   </script>
 
 </body>
 </html>
-
-
-

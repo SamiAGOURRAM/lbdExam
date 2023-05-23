@@ -5,7 +5,11 @@ if(!isset($_SESSION['loggedin']) || trim($_SESSION['loggedin']) === ''){
     header('location:/index.html?not logged in');
 }
 require('../dbconnect/dbconnect.php');
-$eid = $_GET['eid'];
+$query ='SELECT * FROM elections';
+$stmt = $db->prepare($query);
+$stmt->execute();
+$result = $stmt->get_result();
+$data = $result->fetch_all();
 
 
 ?>
@@ -33,7 +37,6 @@ $eid = $_GET['eid'];
 
   <!-- Template Main CSS File -->
   <link href="/assets/main.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
   <!-- =======================================================
@@ -97,40 +100,8 @@ $eid = $_GET['eid'];
     <section class="sample-page">
     <div class="wrapper">
         <div class="container-fluid">
-        <form method="post" action="vote_process.php">
-      <div class="mb-4">
-        <label for="candidate" class="text-lg">Select Candidate:</label>
-        <select class="form-select mt-1 block w-full" id="candidate" name="candidate">
-          <?php
-          // Connect to the database
-
-          // Fetch the candidate data from the database
-          $query = "SELECT candidate_id, candidate_name FROM candidates WHERE election_id = ?";
-          $stmt = $db->prepare($query);
-          $stmt->bind_param('i',$eid );
-          
-          $stmt->execute();
-          $result = $stmt->get_result();
-
-          if (!$result) {
-            die("Query failed: " . mysqli_error($db));
-          }
-
-          // Loop through the candidate data and generate the options dynamically
-          while ($row = mysqli_fetch_assoc($result)) {
-            echo '<option value="' . $row['candidate_id'] . '">' . $row['candidate_name'] . '</option>';
-          }
-
-          // Close the database connection
-          mysqli_close($db);
-          ?>
-        </select>
-      </div>
-          khkgjhg
-      <button type="submit" class="">
-        Vote
-      </button>
-    </form>     
+            <div id='elections' class="Dashboard_container w-50 d-flex flex-row align-items-center flex-wrap">
+            </div>        
         </div>
     </div>
     </section>
@@ -235,6 +206,3 @@ $eid = $_GET['eid'];
 
 </body>
 </html>
-
-
-

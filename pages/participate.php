@@ -1,13 +1,12 @@
-
 <?php
 session_start();
 if(!isset($_SESSION['loggedin']) || trim($_SESSION['loggedin']) === ''){
     header('location:/index.html?not logged in');
 }
-require('../dbconnect/dbconnect.php');
+if(!isset($_GET['eid']) || trim($_GET['eid']) == ""){
+    header('location:dashboard.php?error=chose an election to participate in');
+}
 $eid = $_GET['eid'];
-
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,7 +15,7 @@ $eid = $_GET['eid'];
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Voting - dashboard</title>
+  <title>Freshly - Login</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -28,13 +27,11 @@ $eid = $_GET['eid'];
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Amatic+SC:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
 
-  <!-- Vendor CSS Files -->
-
 
   <!-- Template Main CSS File -->
   <link href="/assets/main.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
 
   <!-- =======================================================
   * Template Name: Yummy
@@ -63,15 +60,14 @@ $eid = $_GET['eid'];
     <div class="container d-flex align-items-center justify-content-between">
 
     <a href="/index.php" class="logo d-flex align-items-center me-auto me-lg-0">
-        <!-- Uncomment the line below if you also wish to use an image logo 
-        <img src="/assets/img/logo.png" alt="logo">-->
-        <h1>Voting System<span>.</span></h1>
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <img src="/assets/img/logo.png" alt="logo">
+        <h1>Freshly<span>.</span></h1>
       </a>
 
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a href="/index.php">Home</a></li>
-          <li><a href="create_election.php">create an Election</a></li>
+          <li><a href="dashboard.php">Elections</a></li>
         </ul>
       </nav><!-- .navbar -->
 
@@ -88,7 +84,7 @@ $eid = $_GET['eid'];
       <div class="container">
 
         <div class="d-flex justify-content-center">
-          <h2 class="text-center">election dashboard</h2>
+          <h2 class="text-center">participate</h2>
         </div>
 
       </div>
@@ -97,40 +93,23 @@ $eid = $_GET['eid'];
     <section class="sample-page">
     <div class="wrapper">
         <div class="container-fluid">
-        <form method="post" action="vote_process.php">
-      <div class="mb-4">
-        <label for="candidate" class="text-lg">Select Candidate:</label>
-        <select class="form-select mt-1 block w-full" id="candidate" name="candidate">
-          <?php
-          // Connect to the database
+            <div class="Dashboard_container w-50 d-flex flex-row align-items-center flex-wrap">
+              <div class="card" style="width: 18rem;">
+                <img class="card-img-top" src="../assets/candidate.jpg" alt="Card image cap">
+                  <div class="card-body">
+                    <h5 class="card-title">Candidate</h5>
+                    <a href="candidate.php?eid=<?php echo $eid?>" class="mr-3" title="View Employee Details" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                  </div>
+              </div>
 
-          // Fetch the candidate data from the database
-          $query = "SELECT candidate_id, candidate_name FROM candidates WHERE election_id = ?";
-          $stmt = $db->prepare($query);
-          $stmt->bind_param('i',$eid );
-          
-          $stmt->execute();
-          $result = $stmt->get_result();
-
-          if (!$result) {
-            die("Query failed: " . mysqli_error($db));
-          }
-
-          // Loop through the candidate data and generate the options dynamically
-          while ($row = mysqli_fetch_assoc($result)) {
-            echo '<option value="' . $row['candidate_id'] . '">' . $row['candidate_name'] . '</option>';
-          }
-
-          // Close the database connection
-          mysqli_close($db);
-          ?>
-        </select>
-      </div>
-          khkgjhg
-      <button type="submit" class="">
-        Vote
-      </button>
-    </form>     
+              <div class="card" style="width: 18rem;">
+                <img class="card-img-top" src="../assets/vote.jpg" alt="Card image cap">
+                  <div class="card-body">
+                    <h5 class="card-title">Vote</h5>
+                    <a href="vote.php?eid=<?php echo $eid?>" class="mr-3" title="View Employee Details" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                  </div>
+              </div>
+            </div>        
         </div>
     </div>
     </section>
@@ -209,32 +188,11 @@ $eid = $_GET['eid'];
 
 
   <!-- Vendor JS Files -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 
 
   <!-- Template Main JS File -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-  <script>
-    var data = <?php echo json_encode($data)?>;
-    data = data
-    console.log(data);
-
-    data.forEach(element => {
-
-        var card = $('<div>', {class: "card"});
-        var cardBody = $('<div>', {class: "card-img-top"});
-        var text = $('<h5>', {class: "card-title"}).text(element[1]);
-        var anchorPoint =  $('<a>', {href :'participate.php?eid='+element[0],class: "mr-3"}).text('participate in '+ element[1]);
-        cardBody.append(text);
-        cardBody.append(anchorPoint);
-        card.append(cardBody);
-        $('#elections').append(card);
-        
-        
-    });
-  </script>
+  <script src="/assets/js/main.js"></script>
 
 </body>
 </html>
-
-
-

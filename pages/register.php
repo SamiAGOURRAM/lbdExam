@@ -1,4 +1,5 @@
 <?php
+require_once('../dbconnect/dbconnect.php');
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -13,12 +14,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
   if ($domain !== $allowedDomain) {
     // Redirect back to the registration page with an error message
-    header("Location: register.html?error=invalid_domain");
+    header("Location: register_view.php?error=invalid_domain");
     exit();
   }
 
   // Generate a unique activation code
   $activationCode = generateActivationCode();
+
+
+  $query = 'SELECT * FROM users WHERE email = ?;';
+  $stmt = $db->prepare($query);
+  $stmt->bind_param('s', $email);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  if($result->num_rows >0){
+    header("Location: register_view.php?error=email_already exists");
+    exit;
+  }
+  $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+  
+  $query = 'INSERT INTO  users (username, email, password_user, is_admin, is_verified, activation_code) VALUES (?, ?, ?, 0, 1, ?);';
+
+  $stmt = $db->prepare($query);
+  $stmt->bind_param('ssss',$username, $email, $hashed_password, $activationCode );
+  $stmt->execute();
+
+
+
 
   // Validate user input (e.g., check if username or email already exists, enforce password requirements, etc.)
 
@@ -26,16 +48,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   // Insert user data into the Users table with is_verified set to 0 and activation_code set to $activationCode
 
   // Send the activation email to the user
-  sendActivationEmail($email, $activationCode);
+  //sendActivationEmail($email, $activationCode);
 
   // Redirect to a success page or display a success message
-  header("Location: activation_pending.html");
-  exit();
+  header("Location: /index.html");
+
 } else {
   // Redirect to the homepage if accessed directly without submitting the form
-  header("Location: index.html");
+  header("Location: /index.html");
   exit();
 }
+
 
 function generateActivationCode() {
   // Generate a unique activation code (you can customize this code generation according to your preference)
@@ -55,4 +78,6 @@ function sendActivationEmail($email, $activationCode) {
   // Example using mail() function:
   mail($email, $subject, $message);
 }
+
+
 ?>
