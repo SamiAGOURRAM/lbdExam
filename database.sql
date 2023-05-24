@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : mar. 23 mai 2023 à 19:09
+-- Généré le : mer. 24 mai 2023 à 22:23
 -- Version du serveur : 8.0.32
 -- Version de PHP : 8.2.0
 
@@ -35,7 +35,21 @@ CREATE TABLE IF NOT EXISTS `candidates` (
   `photo` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`candidate_id`),
   KEY `election_id` (`election_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Déchargement des données de la table `candidates`
+--
+
+INSERT INTO `candidates` (`candidate_id`, `election_id`, `candidate_name`, `photo`) VALUES
+(1, 3, 'sami', NULL),
+(2, 3, 'sami', NULL),
+(3, 3, 'sami', NULL),
+(4, 3, 'sami', NULL),
+(5, 3, 'sami', NULL),
+(6, 3, 'sami', NULL),
+(7, 3, 'soufiane', NULL),
+(8, 2, 'basma', NULL);
 
 -- --------------------------------------------------------
 
@@ -74,10 +88,19 @@ CREATE TABLE IF NOT EXISTS `programs` (
   `program_title` varchar(255) NOT NULL,
   `program_description` varchar(255) NOT NULL,
   `program_video` varchar(255) NOT NULL,
-  `pragram_affiche` text NOT NULL,
+  `program_affiche` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`program_id`),
   KEY `candidate_id` (`candidate_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Déchargement des données de la table `programs`
+--
+
+INSERT INTO `programs` (`program_id`, `candidate_id`, `program_title`, `program_description`, `program_video`, `program_affiche`) VALUES
+(1, 5, 'ahssan program', 'description hrbana', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'affiche mzyana'),
+(3, 7, 'program d cardio hhh', 'description A', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'affiche A'),
+(4, 8, 'title basma', 'basma description', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'basma affiche');
 
 -- --------------------------------------------------------
 
@@ -121,7 +144,15 @@ CREATE TABLE IF NOT EXISTS `votes` (
   PRIMARY KEY (`vote_id`),
   KEY `election_id` (`election_id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Déchargement des données de la table `votes`
+--
+
+INSERT INTO `votes` (`vote_id`, `election_id`, `user_id`, `vote`, `vote_timestamp`) VALUES
+(1, 3, 2, '5', '2023-05-24'),
+(2, 3, 2, '7', '2023-05-25');
 
 --
 -- Contraintes pour les tables déchargées

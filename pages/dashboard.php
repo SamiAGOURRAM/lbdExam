@@ -5,7 +5,7 @@ if(!isset($_SESSION['loggedin']) || trim($_SESSION['loggedin']) === ''){
     header('location:/index.html?not logged in');
 }
 require('../dbconnect/dbconnect.php');
-$query ='SELECT * FROM elections';
+$query ='SELECT * FROM elections WHERE endDate < CURDATE()';
 $stmt = $db->prepare($query);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -38,6 +38,8 @@ $data = $result->fetch_all();
   <!-- Template Main CSS File -->
   <link href="/assets/main.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+
 
   <!-- =======================================================
   * Template Name: Yummy
@@ -65,7 +67,7 @@ $data = $result->fetch_all();
   <header id="header" class="header fixed-top d-flex align-items-center">
     <div class="container d-flex align-items-center justify-content-between">
 
-    <a href="/index.php" class="logo d-flex align-items-center me-auto me-lg-0">
+    <a href="/index.html" class="logo d-flex align-items-center me-auto me-lg-0">
         <!-- Uncomment the line below if you also wish to use an image logo 
         <img src="/assets/img/logo.png" alt="logo">-->
         <h1>Voting System<span>.</span></h1>
@@ -73,8 +75,15 @@ $data = $result->fetch_all();
 
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a href="/index.php">Home</a></li>
-          <li><a href="create_election.php">create an Election</a></li>
+          <li><a href="dashboard.php">Home</a></li>
+          <?php
+          if(isset($_SESSION['loggedin']) && isset($_SESSION['user']) && $_SESSION['is_admin'] == 1 ){
+            echo '<li><a href="create_election.php">Create an Election</a></li>';
+            echo '<li><a href="view_votes.html">View Results</a></li>';
+          }
+
+           ?>
+          
         </ul>
       </nav><!-- .navbar -->
 
@@ -100,6 +109,20 @@ $data = $result->fetch_all();
     <section class="sample-page">
     <div class="wrapper">
         <div class="container-fluid">
+        <p class="text-red-500">
+      <?php
+        if (isset($_GET['error']) ) {
+          echo $_GET['error'];
+        }
+        ?>
+        </p>
+        <p class="text-green-500">
+      <?php
+        if (isset($_GET['success']) ) {
+          echo $_GET['success'];
+        }
+        ?>
+        </p>
             <div id='elections' class="Dashboard_container w-50 d-flex flex-row align-items-center flex-wrap">
             </div>        
         </div>

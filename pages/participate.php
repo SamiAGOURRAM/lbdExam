@@ -60,9 +60,7 @@ $eid = $_GET['eid'];
     <div class="container d-flex align-items-center justify-content-between">
 
     <a href="/index.php" class="logo d-flex align-items-center me-auto me-lg-0">
-        <!-- Uncomment the line below if you also wish to use an image logo -->
-        <img src="/assets/img/logo.png" alt="logo">
-        <h1>Freshly<span>.</span></h1>
+        <h1>Election plateform<span>.</span></h1>
       </a>
 
       <nav id="navbar" class="navbar">
@@ -192,7 +190,6 @@ $eid = $_GET['eid'];
 
 
   <!-- Template Main JS File -->
-  <script src="/assets/js/main.js"></script>
 
 </body>
 </html>

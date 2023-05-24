@@ -4,8 +4,13 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] == false){
     header("location:/index.html?error=you are not loggedin");
     exit;
 }
-if(!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] == 0){
-    header("location:dashboard.php?error=you can not create an election");
+if(!isset($_SESSION['user']) || trim($_SESSION['user']) === ''){
+    header("location:dashboard.php?error=you can not candidate to an election");
+    exit;
+}
+
+if(!isset($_GET['eid']) || trim($_GET['eid']) === ''){
+    header("location:dashboard.php?error=you can not candidate");
     exit;
 }
 ?>
@@ -17,7 +22,7 @@ if(!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] == 0){
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Create election</title>
+  <title>Candidate to an election</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -51,12 +56,12 @@ if(!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] == 0){
       <a href="index.html" class="logo d-flex align-items-center me-auto me-lg-0">
         <!-- Uncomment the line below if you also wish to use an image logo -->
         <!-- <img src="assets/img/logo.png" alt=""> -->
-        <h1>Freshly<span>.</span></h1>
+        <h1>Elections plateform<span>.</span></h1>
       </a>
 
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a href="/index.html">Home</a></li>
+          <li><a href="" onclick="history.back()">Home</a></li>
           <li><a href="dashboard.php">Elections</a></li>
         </ul>
       </nav><!-- .navbar -->
@@ -71,10 +76,10 @@ if(!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] == 0){
       <div class="container">
 
         <div class="d-flex justify-content-between align-items-center">
-          <h2>New election</h2>
+          <h2>candidate election</h2>
           <ol>
-            <li><a href="dashboard.php">Home</a></li>
-            <li>Create election</li>
+            <li><a onclick='history.back()'href="">Home</a></li>
+            <li>Candidate</li>
           </ol>
         </div>
 
@@ -83,28 +88,33 @@ if(!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] == 0){
 
     <section class="sample-page">
       <div class="d-flex justify-content-center flex-nowrap">
-      <form action="process-create-election.php" method="POST" class="w-50 margin-auto" id="form" >
+      <form action="create-candidate.php" method="POST" class="w-50 margin-auto" id="form" >
+
+      <div class="form-group hidden">
+            <input hidden readonly class="form-control"type="text" name="eid" value=<?php echo $_GET['eid']?>>
+        </div>
+
         <div class="form-group">
-            <label for="title">Title: </label>
+            <label for="title">Candidate name : </label>
+            <input class="form-control"type="text" name="candidate_name"  >
+        </div>
+
+        <div class="form-group">
+            <label for="title">Program title : </label>
             <input class="form-control"type="text" name="title"  >
         </div>
 
         <div class="form-group">
-            <label for="descr">description: </label>
-            <input class="form-control"type="text" name="descr"  >
+            <label for="descr">Program description: </label>
+            <input class="form-control" type="text" name='descr'>
         </div>
 
         <div class="form-group">
-            <label for="date">Start Date: </label>
-            <input type="date" name='start_date' id="startDate">
+            <label for="program">Program affiche : </label>
+            <input class="form-control" type="text" name='affiche'>
         </div>
 
-        <div class="form-group">
-            <label for="date">End Date: </label>
-            <input type="date" name='end_date' id="endDate">
-        </div>
-
-        <input class="form-control mt-3 bg-primary text-light" type="submit" value="Create Ingredient">
+        <input class="form-control mt-3 bg-primary text-light" type="submit" value="Candidate">
     </form>
 
       </div>
@@ -186,39 +196,7 @@ if(!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] == 0){
 
 
   <!-- Template Main JS File -->
-  <script src="/assets/js/main.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-  <script>
-    function compareDates() {
-        //Get the text in the elements
-        var from = document.getElementById('endDate').textContent;
-        var to = document.getElementById('startDate').textContent;
-
-        //Generate an array where the first element is the year, second is month and third is day
-        var splitFrom = from.split('/');
-        var splitTo = to.split('/');
-
-        //Create a date object from the arrays
-        var fromDate = Date.parse(splitFrom[0], splitFrom[1] - 1, splitFrom[2]);
-        var toDate = Date.parse(splitTo[0], splitTo[1] - 1, splitTo[2]);
-
-        //Return the result of the comparison
-        return fromDate < toDate;
-    }
-    
-    endDate.min = new Date().toISOString().split("T")[0];
-    var end_date =document.getElementById('endDate').value;
-    var start_date =document.getElementById('startDate').value;
-    document.getElementById('form').addEventListener('submit', (e)=>{
-        console.log(compareDates())
-        if(compareDates()){
-            e.preventDefault();
-            $("#err").html("invalid dates");
-            $("#err").attr('class', 'alert alert-danger');
-        }
-        
-    })
-  </script>
 
 </body>
 </html>

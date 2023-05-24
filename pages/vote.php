@@ -62,7 +62,7 @@ $eid = $_GET['eid'];
   <header id="header" class="header fixed-top d-flex align-items-center">
     <div class="container d-flex align-items-center justify-content-between">
 
-    <a href="/index.php" class="logo d-flex align-items-center me-auto me-lg-0">
+    <a href="dashboard.php" class="logo d-flex align-items-center me-auto me-lg-0">
         <!-- Uncomment the line below if you also wish to use an image logo 
         <img src="/assets/img/logo.png" alt="logo">-->
         <h1>Voting System<span>.</span></h1>
@@ -70,8 +70,8 @@ $eid = $_GET['eid'];
 
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a href="/index.php">Home</a></li>
-          <li><a href="create_election.php">create an Election</a></li>
+          <li><a onclick="history.back()">Home</a></li>
+          <li><a href="create_election.php">Create an Election</a></li>
         </ul>
       </nav><!-- .navbar -->
 
@@ -88,7 +88,7 @@ $eid = $_GET['eid'];
       <div class="container">
 
         <div class="d-flex justify-content-center">
-          <h2 class="text-center">election dashboard</h2>
+          <h2 class="text-center">Election dashboard</h2>
         </div>
 
       </div>
@@ -99,37 +99,50 @@ $eid = $_GET['eid'];
         <div class="container-fluid">
         <form method="post" action="vote_process.php">
       <div class="mb-4">
+      <p class="text-red-500">
+      <?php
+        if (isset($_GET['error']) ) {
+          echo $_GET['error'];
+        }
+        ?>
+        </p>
+        <p class="text-green-500">
+      <?php
+        if (isset($_GET['success']) ) {
+          echo $_GET['success'];
+        }
+        ?>
+        </p>
+
+
         <label for="candidate" class="text-lg">Select Candidate:</label>
-        <select class="form-select mt-1 block w-full" id="candidate" name="candidate">
+        <div id='candidates' class="Dashboard_container w-50 d-flex flex-row align-items-center flex-wrap">
+            </div> 
           <?php
           // Connect to the database
 
           // Fetch the candidate data from the database
-          $query = "SELECT candidate_id, candidate_name FROM candidates WHERE election_id = ?";
+          $query = "SELECT * FROM candidates NATURAL JOIN programs NATURAL JOIN elections  WHERE election_id = ?";
           $stmt = $db->prepare($query);
           $stmt->bind_param('i',$eid );
           
           $stmt->execute();
           $result = $stmt->get_result();
+          $data = $result->fetch_all();
 
           if (!$result) {
+
             die("Query failed: " . mysqli_error($db));
-          }
 
-          // Loop through the candidate data and generate the options dynamically
-          while ($row = mysqli_fetch_assoc($result)) {
-            echo '<option value="' . $row['candidate_id'] . '">' . $row['candidate_name'] . '</option>';
           }
-
+          if($result->num_rows >0){
+            $_SESSION['eid_vote'] = $eid;
+          }
+          
           // Close the database connection
           mysqli_close($db);
           ?>
-        </select>
       </div>
-          khkgjhg
-      <button type="submit" class="">
-        Vote
-      </button>
     </form>     
         </div>
     </div>
@@ -222,12 +235,15 @@ $eid = $_GET['eid'];
 
         var card = $('<div>', {class: "card"});
         var cardBody = $('<div>', {class: "card-img-top"});
-        var text = $('<h5>', {class: "card-title"}).text(element[1]);
-        var anchorPoint =  $('<a>', {href :'participate.php?eid='+element[0],class: "mr-3"}).text('participate in '+ element[1]);
+        var text = $('<h5>', {class: "card-title"}).text(element[2]);
+        var anchorPoint =  $('<a>', {href :'vote_process?candidate_id='+element[1],class: "bg-green-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full mr-3"}).text('Vote for : '+ element[2]);
+        var video_program = $('<a>', {href :element[7],class: "mr-3"}).text('Program video');
+
         cardBody.append(text);
         cardBody.append(anchorPoint);
+        cardBody.append(video_program);
         card.append(cardBody);
-        $('#elections').append(card);
+        $('#candidates').append(card);
         
         
     });
